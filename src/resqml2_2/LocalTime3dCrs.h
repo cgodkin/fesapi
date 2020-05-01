@@ -32,7 +32,7 @@ namespace RESQML2_2_NS
 		 *
 		 * @param [in,out]	partialObject	If non-null, the partial object.
 		 *
-		 * @returns	A DLL_IMPORT_OR_EXPORT.
+		 * 
 		 */
 		DLL_IMPORT_OR_EXPORT LocalTime3dCrs(gsoap_resqml2_0_1::eml20__DataObjectReference* partialObject) : RESQML2_NS::LocalTime3dCrs(partialObject) {}
 
@@ -177,18 +177,8 @@ namespace RESQML2_2_NS
 		/** Destructor does nothing since the memory is manged by the gsoap context. */
 		~LocalTime3dCrs() {}
 
-		/**
-		 * Gets the unit
-		 *
-		 * @returns	The unit.
-		 */
 		DLL_IMPORT_OR_EXPORT gsoap_resqml2_0_1::eml20__TimeUom getUnit() const final;
 
-		/**
-		 * Gets unit as string
-		 *
-		 * @returns	The unit as string.
-		 */
 		DLL_IMPORT_OR_EXPORT std::string getUnitAsString() const final;
 
 	private:

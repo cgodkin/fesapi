@@ -32,7 +32,7 @@ namespace RESQML2_2_NS
 		 *
 		 * @param [in,out]	partialObject	If non-null, the partial object.
 		 *
-		 * @returns	A DLL_IMPORT_OR_EXPORT.
+		 * 
 		 */
 		DLL_IMPORT_OR_EXPORT MdDatum(gsoap_resqml2_0_1::eml20__DataObjectReference* partialObject) : RESQML2_NS::MdDatum(partialObject) {}
 
@@ -67,39 +67,14 @@ namespace RESQML2_2_NS
 		/** Destructor does nothing since the memory is managed by the gsoap context. */
 		~MdDatum() {}
 
-		/**
-		 * Get the Local 3d CRS dor where the reference point ordinals are given
-		 *
-		 * @returns	Null if it fails, else the local crs dor.
-		 */
 		COMMON_NS::DataObjectReference getLocalCrsDor() const final;
 
-		/**
-		 * Getter of the first ordinal of the reference location.
-		 *
-		 * @returns	The x coordinate.
-		 */
 		DLL_IMPORT_OR_EXPORT double getX() const final;
 
-		/**
-		 * Getter of the second ordinal of the reference location.
-		 *
-		 * @returns	The y coordinate.
-		 */
 		DLL_IMPORT_OR_EXPORT double getY() const final;
 
-		/**
-		 * Getter of the third ordinal of the reference location.
-		 *
-		 * @returns	The z coordinate.
-		 */
 		DLL_IMPORT_OR_EXPORT double getZ() const final;
 
-		/**
-		 * Getter of the origin kind of the MD.
-		 *
-		 * @returns	The origin kind.
-		 */
 		DLL_IMPORT_OR_EXPORT gsoap_eml2_3::eml23__WellboreDatumReference getOriginKind() const final;
 
 		/** Loads target relationships */

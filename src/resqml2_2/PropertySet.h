@@ -36,7 +36,7 @@ namespace RESQML2_2_NS
 		 *
 		 * @param [in,out]	partialObject	If non-null, the partial object.
 		 *
-		 * @returns	A DLL_IMPORT_OR_EXPORT.
+		 * 
 		 */
 		DLL_IMPORT_OR_EXPORT PropertySet(gsoap_resqml2_0_1::eml20__DataObjectReference* partialObject) : RESQML2_NS::PropertySet(partialObject) {}
 
@@ -69,26 +69,10 @@ namespace RESQML2_2_NS
 		/** Destructor does nothing since the memory is managed by the gsoap context. */
 		~PropertySet() {}
 
-		/**
-		 * If true, indicates that the collection contains properties with defined realization indices.
-		 *
-		 * @returns	True if multiple realizations, false if not.
-		 */
 		DLL_IMPORT_OR_EXPORT bool hasMultipleRealizations() const final;
 
-		/**
-		 * If true, indicates that the collection contains only property values associated with a single
-		 * property kind.
-		 *
-		 * @returns	True if single property kind, false if not.
-		 */
 		DLL_IMPORT_OR_EXPORT bool hasSinglePropertyKind() const final;
 
-		/**
-		 * Gets time set kind
-		 *
-		 * @returns	The time set kind of this property set.
-		 */
 		DLL_IMPORT_OR_EXPORT gsoap_eml2_3::resqml22__TimeSetKind getTimeSetKind() const final;
 
 	private :

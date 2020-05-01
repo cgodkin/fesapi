@@ -32,7 +32,7 @@ namespace RESQML2_2_NS
 		 *
 		 * @param [in,out]	partialObject	If non-null, the partial object.
 		 *
-		 * @returns	A DLL_IMPORT_OR_EXPORT.
+		 * 
 		 */
 		DLL_IMPORT_OR_EXPORT NonSealedSurfaceFrameworkRepresentation(gsoap_resqml2_0_1::eml20__DataObjectReference* partialObject) : RESQML2_NS::NonSealedSurfaceFrameworkRepresentation(partialObject) {}
 
@@ -58,14 +58,6 @@ namespace RESQML2_2_NS
 		/** Destructor does nothing since the memory is managed by the gsoap context. */
 		~NonSealedSurfaceFrameworkRepresentation() {}
 
-		/**
-		 * Pushes back a contact representation in the structural framework
-		 *
-		 * @param 		  	pointCount	Number of points.
-		 * @param [in,out]	points	  	If non-null, the points.
-		 * @param [in,out]	proxy	  	(Optional) If non-null, the proxy.
-		 * @param [in,out]	localCrs  	(Optional) If non-null, the local crs.
-		 */
 		DLL_IMPORT_OR_EXPORT void pushBackNonSealedContactRepresentation(unsigned int pointCount, double const* points, EML2_NS::AbstractHdfProxy* proxy = nullptr, RESQML2_NS::AbstractLocal3dCrs* localCrs = nullptr) final;
                 
         /**
