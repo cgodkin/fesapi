@@ -18,25 +18,33 @@ under the License.
 -----------------------------------------------------------------------*/
 #include "WellboreFrameRepresentation.h"
 
-#include "../resqml2_0_1/WellboreInterpretation.h"
-#include "../resqml2_0_1/WellboreTrajectoryRepresentation.h"
+#include "../resqml2/WellboreInterpretation.h"
+#include "../resqml2/WellboreTrajectoryRepresentation.h"
 
 using namespace std;
 using namespace RESQML2_2_NS;
-using namespace gsoap_eml2_2;
+using namespace gsoap_eml2_3;
 
 const char* WellboreFrameRepresentation::XML_TAG = "WellboreFrameRepresentation";
+const char* WellboreFrameRepresentation::XML_NS = "resqml22";
 
-WellboreFrameRepresentation::WellboreFrameRepresentation(RESQML2_0_1_NS::WellboreInterpretation* interp, const string& guid, const std::string& title, RESQML2_0_1_NS::WellboreTrajectoryRepresentation* traj)
+WellboreFrameRepresentation::WellboreFrameRepresentation(RESQML2_NS::WellboreInterpretation* interp, const string& guid, const std::string& title, RESQML2_NS::WellboreTrajectoryRepresentation* traj)
 {
-	gsoapProxy2_2 = soap_new__resqml22__WellboreFrameRepresentation(interp->getGsoapContext());
-	resqml22__WellboreFrameRepresentation* frame = static_cast<resqml22__WellboreFrameRepresentation*>(gsoapProxy2_2);
+	if (interp == nullptr) {
+		throw invalid_argument("The wellbore interpretation this wellbore frame represents cannot be null.");
+	}
+	if (traj == nullptr) {
+		throw invalid_argument("The wellbore trajectory representation cannot be null.");
+	}
+
+	gsoapProxy2_3 = soap_new__resqml22__WellboreFrameRepresentation(interp->getGsoapContext());
+	resqml22__WellboreFrameRepresentation* frame = static_cast<resqml22__WellboreFrameRepresentation*>(gsoapProxy2_3);
 
 	initMandatoryMetadata();
-	setMetadata(guid, title, std::string(), -1, std::string(), std::string(), -1, std::string());
+	setMetadata(guid, title, "", -1, "", "", -1, "");
 
 	setInterpretation(interp);
 
-	frame->Trajectory = traj->newEml22Reference();
+	frame->Trajectory = traj->newEml23Reference();
 	getRepository()->addRelationship(this, traj);
 }

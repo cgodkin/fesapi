@@ -19,30 +19,35 @@ under the License.
 #include "CategoricalProperty.h"
 
 #include <stdexcept>
-#include <sstream>
 
-#include <hdf5.h>
-
-#include "../common/AbstractHdfProxy.h"
 #include "../common/EnumStringMapper.h"
 
 #include "../resqml2/AbstractRepresentation.h"
+#include "../resqml2/DoubleTableLookup.h"
+#include "../resqml2/StringTableLookup.h"
+
 #include "PropertyKind.h"
-#include "StringTableLookup.h"
 
 using namespace std;
 using namespace RESQML2_0_1_NS;
 using namespace gsoap_resqml2_0_1;
 
-const char* CategoricalProperty::XML_TAG = "CategoricalProperty";
+const char* CategoricalProperty::XML_NS = "resqml20";
 
 CategoricalProperty::CategoricalProperty(RESQML2_NS::AbstractRepresentation * rep, const string & guid, const string & title,
-	unsigned int dimension, gsoap_resqml2_0_1::resqml20__IndexableElements attachmentKind,
-	StringTableLookup* strLookup, resqml20__ResqmlPropertyKind energisticsPropertyKind)
+	unsigned int dimension, gsoap_eml2_3::resqml22__IndexableElement attachmentKind,
+	RESQML2_NS::StringTableLookup* strLookup, resqml20__ResqmlPropertyKind energisticsPropertyKind)
 {
+	if (rep == nullptr) {
+		throw invalid_argument("The representation of this property values cannot be null.");
+	}
+	if (strLookup == nullptr) {
+		throw invalid_argument("The string lookup table cannot be null.");
+	}
+
 	gsoapProxy2_0_1 = soap_new_resqml20__obj_USCORECategoricalProperty(rep->getGsoapContext());	
 	_resqml20__CategoricalProperty* prop = static_cast<_resqml20__CategoricalProperty*>(gsoapProxy2_0_1);
-	prop->IndexableElement = attachmentKind;
+	prop->IndexableElement = mapIndexableElement(attachmentKind);
 	prop->Count = dimension;
 
 	resqml20__StandardPropertyKind* xmlStandardPropKind = soap_new_resqml20__StandardPropertyKind(gsoapProxy2_0_1->soap);
@@ -50,47 +55,103 @@ CategoricalProperty::CategoricalProperty(RESQML2_NS::AbstractRepresentation * re
 	prop->PropertyKind = xmlStandardPropKind;
 
 	initMandatoryMetadata();
-	setMetadata(guid, title, std::string(), -1, std::string(), std::string(), -1, std::string());
+	setMetadata(guid, title, "", -1, "", "", -1, "");
+
+	setRepresentation(rep);
 
 	prop->Lookup = strLookup->newResqmlReference();
 	getRepository()->addRelationship(this, strLookup);
-
-	setRepresentation(rep);
 }
 
 CategoricalProperty::CategoricalProperty(RESQML2_NS::AbstractRepresentation * rep, const string & guid, const string & title,
-	unsigned int dimension, gsoap_resqml2_0_1::resqml20__IndexableElements attachmentKind,
-	StringTableLookup* strLookup, COMMON_NS::PropertyKind * localPropKind)
+	unsigned int dimension, gsoap_eml2_3::resqml22__IndexableElement attachmentKind,
+	RESQML2_NS::DoubleTableLookup* dblLookup, resqml20__ResqmlPropertyKind energisticsPropertyKind)
 {
-	gsoapProxy2_0_1 = soap_new_resqml20__obj_USCORECategoricalProperty(rep->getGsoapContext());	
+	if (rep == nullptr) {
+		throw invalid_argument("The representation of this property values cannot be null.");
+	}
+	if (dblLookup == nullptr) {
+		throw invalid_argument("The double lookup table cannot be null.");
+	}
+
+	gsoapProxy2_0_1 = soap_new_resqml20__obj_USCORECategoricalProperty(rep->getGsoapContext());
 	_resqml20__CategoricalProperty* prop = static_cast<_resqml20__CategoricalProperty*>(gsoapProxy2_0_1);
-	prop->IndexableElement = attachmentKind;
+	prop->IndexableElement = mapIndexableElement(attachmentKind);
 	prop->Count = dimension;
 
-	initMandatoryMetadata();
-	setMetadata(guid, title, std::string(), -1, std::string(), std::string(), -1, std::string());
+	resqml20__StandardPropertyKind* xmlStandardPropKind = soap_new_resqml20__StandardPropertyKind(gsoapProxy2_0_1->soap);
+	xmlStandardPropKind->Kind = energisticsPropertyKind;
+	prop->PropertyKind = xmlStandardPropKind;
 
-	prop->Lookup = strLookup->newResqmlReference();
-	getRepository()->addRelationship(this, strLookup);
+	initMandatoryMetadata();
+	setMetadata(guid, title, "", -1, "", "", -1, "");
 
 	setRepresentation(rep);
 
-	setLocalPropertyKind(localPropKind);
+	prop->Lookup = dblLookup->newResqmlReference();
+	getRepository()->addRelationship(this, dblLookup);
 }
 
-void CategoricalProperty::loadTargetRelationships()
+CategoricalProperty::CategoricalProperty(RESQML2_NS::AbstractRepresentation * rep, const string & guid, const string & title,
+	unsigned int dimension, gsoap_eml2_3::resqml22__IndexableElement attachmentKind,
+	RESQML2_NS::StringTableLookup* strLookup, EML2_NS::PropertyKind * localPropKind)
 {
-	AbstractValuesProperty::loadTargetRelationships();
+	if (rep == nullptr) {
+		throw invalid_argument("The representation of this property values cannot be null.");
+	}
+	if (strLookup == nullptr) {
+		throw invalid_argument("The string lookup table cannot be null.");
+	}
 
-	convertDorIntoRel<StringTableLookup>(static_cast<_resqml20__CategoricalProperty*>(gsoapProxy2_0_1)->Lookup);
+	gsoapProxy2_0_1 = soap_new_resqml20__obj_USCORECategoricalProperty(rep->getGsoapContext());	
+	_resqml20__CategoricalProperty* prop = static_cast<_resqml20__CategoricalProperty*>(gsoapProxy2_0_1);
+	prop->IndexableElement = mapIndexableElement(attachmentKind);
+	prop->Count = dimension;
+
+	initMandatoryMetadata();
+	setMetadata(guid, title, "", -1, "", "", -1, "");
+
+	setRepresentation(rep);
+
+	setPropertyKind(localPropKind);
+
+	prop->Lookup = strLookup->newResqmlReference();
+	getRepository()->addRelationship(this, strLookup);
 }
 
-std::string CategoricalProperty::getStringLookupUuid() const
+CategoricalProperty::CategoricalProperty(RESQML2_NS::AbstractRepresentation * rep, const string & guid, const string & title,
+	unsigned int dimension, gsoap_eml2_3::resqml22__IndexableElement attachmentKind,
+	RESQML2_NS::DoubleTableLookup* dblLookup, EML2_NS::PropertyKind * localPropKind)
 {
-	return static_cast<_resqml20__CategoricalProperty*>(gsoapProxy2_0_1)->Lookup->UUID;
+	if (rep == nullptr) {
+		throw invalid_argument("The representation of this property values cannot be null.");
+	}
+	if (dblLookup == nullptr) {
+		throw invalid_argument("The double lookup table cannot be null.");
+	}
+
+	gsoapProxy2_0_1 = soap_new_resqml20__obj_USCORECategoricalProperty(rep->getGsoapContext());
+	_resqml20__CategoricalProperty* prop = static_cast<_resqml20__CategoricalProperty*>(gsoapProxy2_0_1);
+	prop->IndexableElement = mapIndexableElement(attachmentKind);
+	prop->Count = dimension;
+
+	initMandatoryMetadata();
+	setMetadata(guid, title, "", -1, "", "", -1, "");
+
+	setRepresentation(rep);
+
+	setPropertyKind(localPropKind);
+
+	prop->Lookup = dblLookup->newResqmlReference();
+	getRepository()->addRelationship(this, dblLookup);
 }
 
-bool CategoricalProperty::validatePropertyKindAssociation(COMMON_NS::PropertyKind* pk)
+COMMON_NS::DataObjectReference CategoricalProperty::getLookupDor() const
+{
+	return COMMON_NS::DataObjectReference(static_cast<_resqml20__CategoricalProperty*>(gsoapProxy2_0_1)->Lookup);
+}
+
+bool CategoricalProperty::validatePropertyKindAssociation(EML2_NS::PropertyKind* pk)
 {
 	if (pk == nullptr) {
 		throw invalid_argument("The property kind to validate cannot be null.");
@@ -107,14 +168,17 @@ bool CategoricalProperty::validatePropertyKindAssociation(COMMON_NS::PropertyKin
 				repository->addWarning("Cannot verify if the local property kind " + pk->getUuid() + " of the categorical property " + getUuid() + " is right because one if its parent property kind is abstract.");
 				return true;
 			}
-			if (!pk->isChildOf(resqml20__ResqmlPropertyKind__categorical)) {
-				if (!pk->isChildOf(resqml20__ResqmlPropertyKind__discrete)) {
-					repository->addWarning("The categorical property " + getUuid() + " cannot be associated to a local property kind " + pk->getUuid() + " which does not derive from the discrete or categorical standard property kind. This property will be assumed to be a partial one.");
-					changeToPartialObject();
-					return false;
-				}
-				else {
-					repository->addWarning("The categorical property " + getUuid() + " is associated to a discrete local property kind " + pk->getUuid() + ".");
+			auto pk201 = dynamic_cast<RESQML2_0_1_NS::PropertyKind*>(pk);
+			if (pk201 != nullptr) {
+				if (!pk201->isChildOf(resqml20__ResqmlPropertyKind__categorical)) {
+					if (!pk201->isChildOf(resqml20__ResqmlPropertyKind__discrete)) {
+						repository->addWarning("The categorical property " + getUuid() + " cannot be associated to a local property kind " + pk->getUuid() + " which does not derive from the discrete or categorical standard property kind. This property will be assumed to be a partial one.");
+						changeToPartialObject();
+						return false;
+					}
+					else {
+						repository->addWarning("The categorical property " + getUuid() + " is associated to a discrete local property kind " + pk->getUuid() + ".");
+					}
 				}
 			}
 		}
@@ -159,7 +223,7 @@ bool CategoricalProperty::validatePropertyKindAssociation(gsoap_resqml2_0_1::res
 	return true;
 }
 
-StringTableLookup* CategoricalProperty::getStringLookup()
+gsoap_resqml2_0_1::resqml20__ResqmlPropertyKind CategoricalProperty::getEnergisticsPropertyKind() const
 {
-	return getRepository()->getDataObjectByUuid<StringTableLookup>(getStringLookupUuid());
+	return getEnergisticsPropertyKind201();
 }

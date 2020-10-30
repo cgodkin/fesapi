@@ -22,7 +22,7 @@ using namespace std;
 using namespace RESQML2_0_1_NS;
 using namespace gsoap_resqml2_0_1;
 
-const char* BoundaryFeature::XML_TAG = "BoundaryFeature";
+const char* BoundaryFeature::XML_NS = "resqml20";
 
 BoundaryFeature::BoundaryFeature(COMMON_NS::DataObjectRepository * repo, const string & guid, const string & title)
 {
@@ -33,7 +33,7 @@ BoundaryFeature::BoundaryFeature(COMMON_NS::DataObjectRepository * repo, const s
 	gsoapProxy2_0_1 = soap_new_resqml20__obj_USCOREBoundaryFeature(repo->getGsoapContext());
 
 	initMandatoryMetadata();
-	setMetadata(guid, title, std::string(), -1, std::string(), std::string(), -1, std::string());
+	setMetadata(guid, title, "", -1, "", "", -1, "");
 
 	repo->addOrReplaceDataObject(this);
 }

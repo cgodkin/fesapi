@@ -9,9 +9,9 @@ set (FESAPI_ROOT_DIR ${CMAKE_SOURCE_DIR})
 set (FESAPI_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR})
 
 # version mechanism
-set (Fesapi_VERSION_MAJOR 1)
-set (Fesapi_VERSION_MINOR 1)
-set (Fesapi_VERSION_PATCH 1)
+set (Fesapi_VERSION_MAJOR 2)
+set (Fesapi_VERSION_MINOR 0)
+set (Fesapi_VERSION_PATCH 0)
 set (Fesapi_VERSION_TWEAK 0)
 
 set (Fesapi_VERSION ${Fesapi_VERSION_MAJOR}.${Fesapi_VERSION_MINOR}.${Fesapi_VERSION_PATCH}.${Fesapi_VERSION_TWEAK})
@@ -21,13 +21,6 @@ set (CPP_LIBRARY_NAME FesapiCpp)
 if(NOT CMAKE_BUILD_TYPE)
 	set(CMAKE_BUILD_TYPE "Release")
 endif()
-
-file (GLOB FESAPI_PROXIES_SOURCES ${FESAPI_ROOT_DIR}/src/proxies/*.cpp)
-set (FESAPI_PROXIES_SOURCES
-	${FESAPI_PROXIES_SOURCES}
-	${CMAKE_CURRENT_SOURCE_DIR}/src/proxies/struct_tm.cpp
-)
-file (GLOB FESAPI_PROXIES_HEADERS ${FESAPI_ROOT_DIR}/src/proxies/*.h)
 
 set (BUILD_SHARED_LIBS ON CACHE BOOL "Build shared lib")
 
@@ -134,7 +127,64 @@ else (BUILD_SHARED_LIBS)
 	set (LIB_TYPE STATIC)
 endif (BUILD_SHARED_LIBS)
 
-set (WITH_EXPERIMENTAL OFF CACHE BOOL "Compile some experimental functionalities.")
+set (WITH_ETP OFF CACHE BOOL "Build Fesapi with ETP support.")
+set (WITH_ETP_SSL OFF CACHE BOOL "Build Fesapi with ETP SSL support.")
+if (WITH_ETP)
+	find_package (Threads)
+
+	# avro DEPENDENCY
+	set (AVRO_INCLUDE_DIR AVRO_INCLUDE_DIR-NOTFOUND CACHE PATH "Path to the directory which contains the avro header files")
+	if (NOT IS_DIRECTORY ${AVRO_INCLUDE_DIR})
+		message(WARNING "The Avro include dir (AVRO_INCLUDE_DIR variable) does not look to be a valid directory. Please modify it.")
+	endif ()
+	set (AVRO_LIBRARY_RELEASE AVRO_LIBRARY_RELEASE-NOTFOUND CACHE FILEPATH "Path to the file which contains the avro library release")
+	if (NOT EXISTS ${AVRO_LIBRARY_RELEASE})
+		message(WARNING "The avro library (AVRO_LIBRARY_RELEASE variable) does not look to be a valid file. Please modify it.")
+	endif ()
+	set (AVRO_LIBRARY_DEBUG AVRO_LIBRARY_DEBUG-NOTFOUND CACHE FILEPATH "Path to the file which contains the AVRO library DEBUG")
+	if (NOT EXISTS ${AVRO_LIBRARY_DEBUG})
+		message(WARNING "The AVRO library (AVRO_LIBRARY_DEBUG variable) does not look to be a valid file. Please modify it.")
+	endif ()
+
+	# Boost DEPENDENCY
+	find_package(Boost 1.66.0 REQUIRED system)
+	if (Boost_MINOR_VERSION GREATER 69)
+		message(ERROR ": The Boost library cannot be superior to 1.69.0.")
+	endif ()
+	
+	add_subdirectory (etpClientExample)
+	add_subdirectory (etpServerExample)
+endif (WITH_ETP)
+
+set (WITH_RESQML2_2 OFF CACHE BOOL "Compile RESQML2.2 experimental support. Don't use it in production.")
+
+# ============================================================================
+# Gsoap proxies source
+# ============================================================================
+
+list(APPEND FESAPI_PROXIES_SOURCES
+	${FESAPI_ROOT_DIR}/src/proxies/envC.cpp
+	${FESAPI_ROOT_DIR}/src/proxies/gsoap_eml2_1C.cpp
+	${FESAPI_ROOT_DIR}/src/proxies/gsoap_eml2_2C.cpp
+	${FESAPI_ROOT_DIR}/src/proxies/gsoap_resqml2_0_1C.cpp
+	${FESAPI_ROOT_DIR}/src/proxies/gsoap_eml2_3C.cpp
+	${FESAPI_ROOT_DIR}/src/proxies/namespace.cpp
+	${FESAPI_ROOT_DIR}/src/proxies/stdsoap2.cpp
+	${FESAPI_ROOT_DIR}/src/proxies/struct_tm.cpp
+)
+list(APPEND FESAPI_PROXIES_HEADERS
+	${FESAPI_ROOT_DIR}/src/proxies/envH.h
+	${FESAPI_ROOT_DIR}/src/proxies/envStub.h
+	${FESAPI_ROOT_DIR}/src/proxies/gsoap_eml2_1H.h
+	${FESAPI_ROOT_DIR}/src/proxies/gsoap_eml2_1Stub.h
+	${FESAPI_ROOT_DIR}/src/proxies/gsoap_eml2_2H.h
+	${FESAPI_ROOT_DIR}/src/proxies/gsoap_eml2_2Stub.h
+	${FESAPI_ROOT_DIR}/src/proxies/gsoap_eml2_3H.h
+	${FESAPI_ROOT_DIR}/src/proxies/gsoap_eml2_3Stub.h
+	${FESAPI_ROOT_DIR}/src/proxies/gsoap_resqml2_0_1H.h
+	${FESAPI_ROOT_DIR}/src/proxies/gsoap_resqml2_0_1Stub.h
+	${FESAPI_ROOT_DIR}/src/proxies/stdsoap2.h
+)
 
 # ============================================================================
 # including subdirectories
